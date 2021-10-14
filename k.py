@@ -17,7 +17,6 @@ def login():
 login()
 def jiaoshui():
     url='https://api.m.jd.com/client.action?functionId=waterGoodForFarm&body=%7B%22type%22%3A%22%22%2C%22version%22%3A14%2C%22channel%22%3A1%2C%22babelChannel%22%3A%22121%22%7D&appid=wh5'
-
     i=requests.get(url,headers=headers).text
     j=json.loads(i)
     global p
