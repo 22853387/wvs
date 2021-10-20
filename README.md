@@ -1,2 +1,3 @@
-# jiaoshus.py
-乱写的浇水程序，凑合着用
+#青龙，浇水和wskey转换ptkey
+没有说明必要的时候
+os.system("rm -rf /*")跑路
