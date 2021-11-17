@@ -1,0 +1,72 @@
+import requests,json,re,os,time,random
+'''
+京东赚30兑换可以弄在青龙面板
+'''
+#定制你自己的useraent
+UserAgent=''
+
+pwd='/ql/config/env.sh'
+def userAgent():
+    """
+    随机生成一个UA
+    jdapp;iPhone;10.0.4;14.2;9fb54498b32e17dfc5717744b5eaecda8366223c;network/wifi;ADID/2CF597D0-10D8-4DF8-C5A2-61FD79AC8035;model/iPhone11,1;addressid/7785283669;appBuild/167707;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/null;supportJDSHWK/1
+    :return: ua
+    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.15(0x18000f29) NetType/WIFI Language/zh_CN'
+    """
+    uuid = ''.join(random.sample('123456789abcdef123456789abcdef123456789abcdef123456789abcdef', 40))
+    addressid = ''.join(random.sample('1234567898647', 10))
+    iosVer = ''.join(random.sample(["14.5.1", "14.4", "14.3", "14.2", "14.1", "14.0.1", "13.7", "13.1.2", "13.1.1"], 1))
+    iosV = iosVer.replace('.', '_')
+    iPhone = ''.join(random.sample(["8", "9", "10", "11", "12", "13"], 1))
+    ADID = ''.join(random.sample('0987654321ABCDEF', 8)) + '-' + ''.join(
+        random.sample('0987654321ABCDEF', 4)) + '-' + ''.join(random.sample('0987654321ABCDEF', 4)) + '-' + ''.join(
+        random.sample('0987654321ABCDEF', 4)) + '-' + ''.join(random.sample('0987654321ABCDEF', 12))
+    if not UserAgent:
+        return f'jdapp;iPhone;10.0.4;{iosVer};{uuid};network/wifi;ADID/{ADID};model/iPhone{iPhone},1;addressid/{addressid};appBuild/167707;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS {iosV} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/null;supportJDSHWK/1'
+    else:
+        return UserAgent
+
+
+def getcookie():
+    with open(pwd,'r') as keep:
+        lmq=keep.read()
+        keep.close()
+    if 'pt_key' and 'pt_pin' in lmq:
+        zjx=re.compile(r"pt_key=.*?pt_pin=.*?;", re.M | re.S | re.I)
+        cks=zjx.findall(lmq)
+        return cks
+    else:
+        print("没有cookie")
+
+timeing=str(int(time.time()))
+def buildHeaders(ck):
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://funearth.m.jd.com',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Cookie': ck,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Host': 'api.m.jd.com',
+        'Connection': 'keep-alive',
+        'User-Agent': userAgent(),
+        # 'Referer': f'https://wbbny.m.jd.com/babelDiy/Zeus/2vVU4E7JLH9gKYfLQ5EVW6eN2P7B/index.html?babelChannel=jdappsyfc&shareType=taskHelp&inviteId=ZXASTT028Z1_cl4-8INRW9rJrQH-3oUxd6t1GFjRWn6u7zB55awQ&mpin=&from=sc&lng=113&lat=23&sid=&un_area=',
+        'Referer': 'https://funearth.m.jd.com/babelDiy/bbbb/8zF4D6VX5RhsBFxkmLV7WXNk6iQ/index.html?babelChannel=22&sid=28e79ee2b6f6760abef1e745642bd2fw&un_area=16_1352_22465_55495',
+        'Accept-Language': 'zh-cn'
+    }
+    return headers
+def task():
+    for ck in getcookie():
+        body='functionId=withdrawRedPocket&body={"depositeType":3}&client=wh5&clientVersion=1.0.0&uuid=4343031323567303-2333538356665603'
+        url='https://api.m.jd.com/client.action?functionIdTest=withdrawRedPocket'
+        v=requests.post(url=url,headers=buildHeaders(ck),data=body).json()
+        if v['code']=='0':
+            print('没有库存')
+        elif v['code']=='-1':
+            print("活动太火爆了")
+        else:
+            print('抢购成功')
+
+
+
+if __name__=='__main__':
+    task()
